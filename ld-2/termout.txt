@@ -1,0 +1,486 @@
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda create-function   --function-name lambda-function-2   --zip-file fileb://deployment_package.zip   --runtime python3.8   --handler lambda_function.lambda_handler   --role arn:aws:iam::330512925421:role/LambdaExecutionRole   --timeout 10   --memory-size 128
+{
+    "FunctionName": "lambda-function-2",
+    "FunctionArn": "arn:aws:lambda:us-east-1:330512925421:function:lambda-function-2",
+    "Runtime": "python3.8",
+    "Role": "arn:aws:iam::330512925421:role/LambdaExecutionRole",
+    "Handler": "lambda_function.lambda_handler",
+    "CodeSize": 14267,
+    "Description": "",
+    "Timeout": 10,
+    "MemorySize": 128,
+    "LastModified": "2023-11-15T13:52:00.120+0000",
+    "CodeSha256": "9G1CZEkBxO/HP+EhzsxynGnO0Po4OkmCX3Y4L0f9FtU=",
+    "Version": "$LATEST",
+    "TracingConfig": {
+        "Mode": "PassThrough"
+    },
+    "RevisionId": "0807e5ec-5ece-4b12-b7a3-157e1cb4f58c",
+    "State": "Pending",
+    "StateReason": "The function is being created.",
+    "StateReasonCode": "Creating"
+}
+-----------------------------------------------------------------------------------------------------------------------------------
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws iam update-assume-role-policy --role-name LambdaExecutionRole --policy-document file://assume-role-policy.json
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws iam attach-role-policy --role-name LambdaExecutionRole --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda invoke   --function-name lambda-function-2   --invocation-type RequestResponse   --log-type Tail   output.txt
+{
+    "StatusCode": 200,
+    "LogResult": "U1RBUlQgUmVxdWVzdElkOiA1YmMxYWM5NS00NTA5LTQ0MTQtOGE0NC0wODZhZTRkNDMxYTMgVmVyc2lvbjogJExBVEVTVApFTkQgUmVxdWVzdElkOiA1YmMxYWM5NS00NTA5LTQ0MTQtOGE0NC0wODZhZTRkNDMxYTMKUkVQT1JUIFJlcXVlc3RJZDogNWJjMWFjOTUtNDUwOS00NDE0LThhNDQtMDg2YWU0ZDQzMWEzCUR1cmF0aW9uOiAyNDI1LjAwIG1zCUJpbGxlZCBEdXJhdGlvbjogMjQyNSBtcwlNZW1vcnkgU2l6ZTogMTI4IE1CCU1heCBNZW1vcnkgVXNlZDogNzQgTUIJSW5pdCBEdXJhdGlvbjogMjY1LjA3IG1zCQo=",
+    "ExecutedVersion": "$LATEST"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ cat output.txt 
+"Match"(virt) ubuntu@ip-172-31-18-230:~/ld-2$ vi lambda_function.py 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda invoke   --function-name lambda-function-2   --invocation-type RequestResponse   --log-type Tail   output.txt
+{
+    "StatusCode": 200,
+    "LogResult": "U1RBUlQgUmVxdWVzdElkOiA2Mzc0MmE2ZS1iOTJiLTRkZGYtYjA0Mi1iNmYyYTYzYWY1ZmIgVmVyc2lvbjogJExBVEVTVApFTkQgUmVxdWVzdElkOiA2Mzc0MmE2ZS1iOTJiLTRkZGYtYjA0Mi1iNmYyYTYzYWY1ZmIKUkVQT1JUIFJlcXVlc3RJZDogNjM3NDJhNmUtYjkyYi00ZGRmLWIwNDItYjZmMmE2M2FmNWZiCUR1cmF0aW9uOiAyNDg4LjE1IG1zCUJpbGxlZCBEdXJhdGlvbjogMjQ4OSBtcwlNZW1vcnkgU2l6ZTogMTI4IE1CCU1heCBNZW1vcnkgVXNlZDogNzQgTUIJSW5pdCBEdXJhdGlvbjogMjY2LjI1IG1zCQo=",
+    "ExecutedVersion": "$LATEST"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ cat output.txt 
+"Different"
+---------------------------------------------------------------------------------------------------------------------------
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-api \
+>   --name MyImageComparisonAPI \
+>   --protocol-type HTTP
+{
+    "ApiEndpoint": "https://suxev4zyai.execute-api.us-east-1.amazonaws.com",
+    "ApiId": "suxev4zyai",
+    "ApiKeySelectionExpression": "$request.header.x-api-key",
+    "CreatedDate": "2023-11-15T14:15:48Z",
+    "Name": "MyImageComparisonAPI",
+    "ProtocolType": "HTTP",
+    "RouteSelectionExpression": "$request.method $request.path"
+}
+-----------------------------------------------------------------------------------------------------------------
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway create-rest-api --name comparisonAPI
+{
+    "id": "7xec9zcn1i",
+    "name": "comparisonAPI",
+    "createdDate": 1700058311,
+    "apiKeySource": "HEADER",
+    "endpointConfiguration": {
+        "types": [
+            "EDGE"
+        ]
+    }
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ API=7xec9zcn1i
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway get-resources --rest-api-id $API
+{
+    "items": [
+        {
+            "id": "p59y9i3p0k",
+            "path": "/"
+        }
+    ]
+}
+
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway create-resource --rest-api-id $API --path-part DynamoDBManager --parent-id $PID
+{
+    "id": "sbb7du",
+    "parentId": "p59y9i3p0k",
+    "pathPart": "DynamoDBManager",
+    "path": "/DynamoDBManager"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ RESOURCE=sbb7du
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway put-method --rest-api-id $API --resource-id $RESOURCE --http-method POST --authorization-type NONE
+{
+    "httpMethod": "POST",
+    "authorizationType": "NONE",
+    "apiKeyRequired": false
+}
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ REGION=us-east-1
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ ACCOUNT=330512925421
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 31/functions/arn:aws:lambda:$REGION:$ACCOUNT:function:LambdaFunctionOverHt
+-bash: 31/functions/arn:aws:lambda:us-east-1:330512925421:function:LambdaFunctionOverHt: No such file or directory
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway put-integration \
+>   --rest-api-id $API \
+>   --resource-id $RESOURCE \
+>   --http-method POST \
+>   --type AWS \
+>   --integration-http-method POST \
+>   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT:function:LambdaFunctionOverHttps/invocations
+{
+    "type": "AWS",
+    "httpMethod": "POST",
+    "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:330512925421:function:LambdaFunctionOverHttps/invocations",
+    "passthroughBehavior": "WHEN_NO_MATCH",
+    "timeoutInMillis": 29000,
+    "cacheNamespace": "sbb7du",
+    "cacheKeyParameters": []
+}
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway put-method-response \
+>   --rest-api-id $API \
+>   --resource-id $RESOURCE \
+>   --http-method POST \
+>   --status-code 200 \
+>   --response-models application/json=Empty
+{
+    "statusCode": "200",
+    "responseModels": {
+        "application/json": "Empty"
+    }
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway put-integration-response \
+>   --rest-api-id $API \
+>   --resource-id $RESOURCE \
+>   --http-method POST \
+>   --status-code 200 \
+>   --response-templates application/json=""
+{
+    "statusCode": "200",
+    "responseTemplates": {
+        "application/json": null
+    }
+}
+
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway put-integration   --rest-api-id $API   --resource-id $RESOURCE   --http-method POST   --type AWS   --integration-http-method POST   --uri arn:aws:apigateway:$REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:$REGION:$ACCOUNT:function:lambda-function-2/invocations
+{
+    "type": "AWS",
+    "httpMethod": "POST",
+    "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:330512925421:function:lambda-function-2/invocations",
+    "passthroughBehavior": "WHEN_NO_MATCH",
+    "timeoutInMillis": 29000,
+    "cacheNamespace": "sbb7du",
+    "cacheKeyParameters": []
+}
+
+
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda add-permission   --function-name lambda-function-2   --statement-id apigateway-test-2   --action lambda:InvokeFunction   --principal apigateway.amazonaws.com   --source-arn "arn:aws:execute-api:$REGION:$ACCOUNT:$API/*/POST/DynamoDBManager"
+{
+    "Statement": "{\"Sid\":\"apigateway-test-2\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:330512925421:function:lambda-function-2\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:execute-api:us-east-1:330512925421:7xec9zcn1i/*/POST/DynamoDBManager\"}}}"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda add-permission \
+>   --function-name lambda-function-2 \
+>   --statement-id apigateway-prod-2 \
+>   --action lambda:InvokeFunction \
+>   --principal apigateway.amazonaws.com \
+>   --source-arn "arn:aws:execute-api:$REGION:$ACCOUNT:$API/prod/POST/DynamoDBManager"
+{
+    "Statement": "{\"Sid\":\"apigateway-prod-2\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-1:330512925421:function:lambda-function-2\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:execute-api:us-east-1:330512925421:7xec9zcn1i/prod/POST/DynamoDBManager\"}}}"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ vi create-item.json
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST https://suxev4zyai.execute-api.us-east-1.amazonaws.com/prod/DynamoDBManager
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST https://suxev4zyai.execute-api.us-east-1.amazonaws.com/DynamoDBManager
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST https://suxev4zyai.execute-api.us-east-1.amazonaws.com/DynamoDBManager -H "x-api-key: R85rlxC0359p7ULeAmflS8etXyOHA7pJ4hK0iCzv"
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ ^C
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST https://suxev4zyai.execute-api.us-east-1.amazonaws.com/prod/DynamoDBManager
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway get-stage --api-id suxev4zyai --stage-name prod
+
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+aws: error: the following arguments are required: --rest-api-id
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway get-stage --api-id suxev4zyai --stage-name prod
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+aws: error: the following arguments are required: --rest-api-id
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway get-stage --rest-api-id suxev4zyai --stage-name prod
+
+An error occurred (NotFoundException) when calling the GetStage operation: Invalid stage identifier specified
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 get-stages --api-id suxev4zyai
+
+{
+    "Items": []
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 get-deployments --api-id suxev4zyai
+
+{
+    "Items": []
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-deployment --api-id suxev4zyai --stage-name prod
+
+An error occurred (BadRequestException) when calling the CreateDeployment operation: Stage prod does not exist. StageName specified on a CreateDeployment request must exist so the stage can be updated with the new deployment.
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-api \
+>     --name YourImageComparisonAPI \
+>     --protocol-type HTTP \
+>     --target lambda-function-2:1
+
+
+An error occurred (BadRequestException) when calling the CreateApi operation: Target only supports HTTP Proxy or Lambda Proxy
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-api \
+>     --name YourImageComparisonAPI \
+>     --protocol-type HTTP
+{
+    "ApiEndpoint": "https://w9cn7ibyt6.execute-api.us-east-1.amazonaws.com",
+    "ApiId": "w9cn7ibyt6",
+    "ApiKeySelectionExpression": "$request.header.x-api-key",
+    "CreatedDate": "2023-11-15T14:51:43Z",
+    "Name": "YourImageComparisonAPI",
+    "ProtocolType": "HTTP",
+    "RouteSelectionExpression": "$request.method $request.path"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ API_ID=$(aws apigatewayv2 get-apis --query 'Items[0].ApiId' --output text)
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-route \
+>     --api-id $API_ID \
+>     --route-key "POST /compare" \
+>     --target arn:aws:lambda:your-region:your-account-id:function:lambda-function-2
+
+An error occurred (BadRequestException) when calling the CreateRoute operation: Unexpected or malformed target in route null. Correct format should be integrations/<integration_id>.
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-route     --api-id $API_ID     --route-key "POST /compare"     --target arn:aws:lambda:$REGION:$ACCOUNT:function:lambda-function-2
+
+An error occurred (BadRequestException) when calling the CreateRoute operation: Unexpected or malformed target in route null. Correct format should be integrations/<integration_id>.
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ INTEGRATION_ID=$(aws apigatewayv2 create-integration \
+>     --api-id $API_ID \
+>     --integration-type AWS_PROXY \
+>     --integration-uri arn:aws:lambda:$REGION:$ACCOUNT:function:lambda-function-2 \
+>     --payload-format-version 2.0 \
+>     --query 'IntegrationId' \
+>     --output text)
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-route \
+>     --api-id $API_ID \
+>     --route-key "POST /compare" \
+>     --target "integrations/$INTEGRATION_ID"
+{
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "RouteId": "7kvm2fp",
+    "RouteKey": "POST /compare",
+    "Target": "integrations/8epurff"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-stage \
+>     --api-id $API_ID \
+>     --stage-name prod
+
+{
+    "CreatedDate": "2023-11-15T14:53:40Z",
+    "DefaultRouteSettings": {
+        "DetailedMetricsEnabled": false
+    },
+    "LastUpdatedDate": "2023-11-15T14:53:40Z",
+    "RouteSettings": {},
+    "StageName": "prod",
+    "StageVariables": {},
+    "Tags": {}
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ API_ENDPOINT=$(aws apigatewayv2 get-apis --query 'Items[0].ApiEndpoint' --output text)
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST $API_ENDPOINT/compare -H "Content-Type: application/json" --data '{"key1":"value1", "key2":"value2"}'
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-stage --api-id $API_ID --stage-name prod
+
+
+An error occurred (ConflictException) when calling the CreateStage operation: Stage already exists
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-stage --api-id $API_ID --stage-name prod1
+{
+    "CreatedDate": "2023-11-15T14:54:46Z",
+    "DefaultRouteSettings": {
+        "DetailedMetricsEnabled": false
+    },
+    "LastUpdatedDate": "2023-11-15T14:54:46Z",
+    "RouteSettings": {},
+    "StageName": "prod1",
+    "StageVariables": {},
+    "Tags": {}
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 get-routes --api-id $API_ID
+{
+    "Items": [
+        {
+            "ApiKeyRequired": false,
+            "AuthorizationType": "NONE",
+            "RouteId": "7kvm2fp",
+            "RouteKey": "POST /compare",
+            "Target": "integrations/8epurff"
+        }
+    ]
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ API_ENDPOINT=$(aws apigatewayv2 get-apis --query 'Items[0].ApiEndpoint' --output text)
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST $API_ENDPOINT/prod1/compare -H "Content-Type: application/json" --data '{"key1":"value1", "key2":"value2"}'
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ echo $API_ENDPOINT
+https://suxev4zyai.execute-api.us-east-1.amazonaws.com
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST https://7xec9zcn1i.execute-api.us-east-1.amazonaws.com/prod/DynamoDBManager -H "Content-Type: application/json" --data '{"key1":"value1", "key2":"value2"}'
+{"message": "Internal server error"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST $API_ENDPOINT/prod1/compare -H "Content-Type: application/json" -H "x-api-key: R85rlxC0359p7ULeAmflS8etXyOHA7pJ4hK0iCzv" --data '{"key1":"value1", "key2":"value2"}'
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST $API_ENDPOINT/prod1/compare -H "Content-Type: application/json" -H "x-api-key: R85rlxC0359p7ULeAmflS8etXyOHA7pJ4hK0iCzv" --data '{"key1":"value1", "key2":"value2"}'aws lambda invoke --function-name lambda-function-1 --payload '{"number1": 5, "number2": 10}' output.txt
+curl: option --function-name: is unknown
+curl: try 'curl --help' or 'curl --manual' for more information
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda invoke   --function-name lambda-function-2   --invocation-type RequestResponse   --log-type Tail   output.txt
+
+{
+    "StatusCode": 200,
+    "LogResult": "U1RBUlQgUmVxdWVzdElkOiA4ZmVjOWIzNC1iMzRmLTRhZTMtOWY4ZS01ZTdmZTgwYzUxMzYgVmVyc2lvbjogJExBVEVTVApFTkQgUmVxdWVzdElkOiA4ZmVjOWIzNC1iMzRmLTRhZTMtOWY4ZS01ZTdmZTgwYzUxMzYKUkVQT1JUIFJlcXVlc3RJZDogOGZlYzliMzQtYjM0Zi00YWUzLTlmOGUtNWU3ZmU4MGM1MTM2CUR1cmF0aW9uOiAyNjIxLjc4IG1zCUJpbGxlZCBEdXJhdGlvbjogMjYyMiBtcwlNZW1vcnkgU2l6ZTogMTI4IE1CCU1heCBNZW1vcnkgVXNlZDogNzUgTUIJSW5pdCBEdXJhdGlvbjogMjY0Ljc5IG1zCQo=",
+    "ExecutedVersion": "$LATEST"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ cat output.txt 
+"Match"(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST $API_ENDPOINT/prod1/compare -H "Content-Type: application/json" -d '{"key1":"value1", "key2":"value2"}'
+{"message":"Not Found"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 put-integration-response \
+>     --api-id $API_ID \
+>     --integration-id $INTEGRATION_ID \
+>     --integration-response-id 200 \
+>     --response-templates "application/json=null"
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+aws: error: argument operation: Invalid choice, valid choices are:
+
+create-api                               | create-api-mapping                      
+create-authorizer                        | create-deployment                       
+create-domain-name                       | create-integration                      
+create-integration-response              | create-model                            
+create-route                             | create-route-response                   
+create-stage                             | create-vpc-link                         
+delete-access-log-settings               | delete-api                              
+delete-api-mapping                       | delete-authorizer                       
+delete-cors-configuration                | delete-deployment                       
+delete-domain-name                       | delete-integration                      
+delete-integration-response              | delete-model                            
+delete-route                             | delete-route-request-parameter          
+delete-route-response                    | delete-route-settings                   
+delete-stage                             | delete-vpc-link                         
+export-api                               | get-api                                 
+get-api-mapping                          | get-api-mappings                        
+get-apis                                 | get-authorizer                          
+get-authorizers                          | get-deployment                          
+get-deployments                          | get-domain-name                         
+get-domain-names                         | get-integration                         
+get-integration-response                 | get-integration-responses               
+get-integrations                         | get-model                               
+get-model-template                       | get-models                              
+get-route                                | get-route-response                      
+get-route-responses                      | get-routes                              
+get-stage                                | get-stages                              
+get-tags                                 | get-vpc-link                            
+get-vpc-links                            | import-api                              
+reimport-api                             | tag-resource                            
+untag-resource                           | update-api                              
+update-api-mapping                       | update-authorizer                       
+update-deployment                        | update-domain-name                      
+update-integration                       | update-integration-response             
+update-model                             | update-route                            
+update-route-response                    | update-stage                            
+update-vpc-link                          | help                                    
+
+
+Invalid choice: 'put-integration-response', maybe you meant:
+
+  * get-integration-response
+  * update-integration-response
+  * get-integration-responses
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 create-deployment \
+>     --api-id $API_ID \
+>     --stage-name prod1
+
+{
+    "AutoDeployed": false,
+    "CreatedDate": "2023-11-15T15:05:53Z",
+    "DeploymentId": "dr0kbz",
+    "DeploymentStatus": "DEPLOYED"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST $API_ENDPOINT/prod1/compare -H "Content-Type: application/json" -d '{"key1":"value1", "key2":"value2"}'
+{"message":"Internal Server Error"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway test-invoke-method --rest-api-id $API \
+> --resource-id $RESOURCE --http-method POST --path-with-query-string "" \
+> --body file://echo.json
+
+Error parsing parameter '--body': Unable to load paramfile file://echo.json: [Errno 2] No such file or directory: 'echo.json'
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigateway test-invoke-method --rest-api-id $API \
+> --resource-id $RESOURCE --http-method POST --path-with-query-string "" \
+> --body file://echo.json
+
+Error parsing parameter '--body': Unable to load paramfile file://echo.json: [Errno 2] No such file or directory: 'echo.json'
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST -d "{\"operation\":\"create\",\"tableName\":\"lambda-
+> apigateway\",\"payload\":{\"Item\":{\"id\":\"1\",\"name\":\"Bob\"}}}"
+curl: no URL specified!
+curl: try 'curl --help' or 'curl --manual' for more information
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ https://$API.execute-api.$REGION.amazonaws.com/prod/DynamoDBManager
+-bash: https://7xec9zcn1i.execute-api.us-east-1.amazonaws.com/prod/DynamoDBManager: No such file or directory
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST -d "{\"operation\":\"create\",\"tableName\":\"lambda-apigateway\",\"payload\":{\"Item\":{\"id\":\"1\",\"name\":\"Bob\"}}}" https://$API.execute-api.$REGION.amazonaws.com/prod/DynamoDBManager
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws apigatewayv2 put-integration-response     --api-id $API_ID     --integration-id $INTEGRATION_ID     --integration-response-id 200     --response-templates "application/json=null"
+usage: aws [options] <command> <subcommand> [<subcommand> ...] [parameters]
+To see help text, you can run:
+
+  aws help
+  aws <command> help
+  aws <command> <subcommand> help
+aws: error: argument operation: Invalid choice, valid choices are:
+
+create-api                               | create-api-mapping                      
+create-authorizer                        | create-deployment                       
+create-domain-name                       | create-integration                      
+create-integration-response              | create-model                            
+create-route                             | create-route-response                   
+create-stage                             | create-vpc-link                         
+delete-access-log-settings               | delete-api                              
+delete-api-mapping                       | delete-authorizer                       
+delete-cors-configuration                | delete-deployment                       
+delete-domain-name                       | delete-integration                      
+delete-integration-response              | delete-model                            
+delete-route                             | delete-route-request-parameter          
+delete-route-response                    | delete-route-settings                   
+delete-stage                             | delete-vpc-link                         
+export-api                               | get-api                                 
+get-api-mapping                          | get-api-mappings                        
+get-apis                                 | get-authorizer                          
+get-authorizers                          | get-deployment                          
+get-deployments                          | get-domain-name                         
+get-domain-names                         | get-integration                         
+get-integration-response                 | get-integration-responses               
+get-integrations                         | get-model                               
+get-model-template                       | get-models                              
+get-route                                | get-route-response                      
+get-route-responses                      | get-routes                              
+get-stage                                | get-stages                              
+get-tags                                 | get-vpc-link                            
+get-vpc-links                            | import-api                              
+reimport-api                             | tag-resource                            
+untag-resource                           | update-api                              
+update-api-mapping                       | update-authorizer                       
+update-deployment                        | update-domain-name                      
+update-integration                       | update-integration-response             
+update-model                             | update-route                            
+update-route-response                    | update-stage                            
+update-vpc-link                          | help                                    
+
+
+Invalid choice: 'put-integration-response', maybe you meant:
+
+  * get-integration-response
+  * update-integration-response
+  * get-integration-responses
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda invoke   --function-name lambda-function-2   --invocation-type RequestResponse   --log-type Tail   output.txt
+{
+    "StatusCode": 200,
+    "LogResult": "U1RBUlQgUmVxdWVzdElkOiBlYmM5MzY5Ny03YWU2LTQ2MTAtYWFjNS1lMzc4OWQ5ZmZiMzQgVmVyc2lvbjogJExBVEVTVApFTkQgUmVxdWVzdElkOiBlYmM5MzY5Ny03YWU2LTQ2MTAtYWFjNS1lMzc4OWQ5ZmZiMzQKUkVQT1JUIFJlcXVlc3RJZDogZWJjOTM2OTctN2FlNi00NjEwLWFhYzUtZTM3ODlkOWZmYjM0CUR1cmF0aW9uOiA2MzYuMjUgbXMJQmlsbGVkIER1cmF0aW9uOiA2MzcgbXMJTWVtb3J5IFNpemU6IDEyOCBNQglNYXggTWVtb3J5IFVzZWQ6IDc1IE1CCQo=",
+    "ExecutedVersion": "$LATEST"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ curl -X POST -H "Content-Type: application/json" -d '{"key1": "value1", "key2": "value2"}' https://7xec9zcn1i.execute-api.us-east-1.amazonaws.com/prod/DynamoDBManager
+{"message": "Internal server error"}(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ aws lambda invoke   --function-name lambda-function-2   --invocation-type RequestResponse   --log-type Tail   output.txt
+{
+    "StatusCode": 200,
+    "LogResult": "U1RBUlQgUmVxdWVzdElkOiBmYzg0NGJiOS04YTc4LTQ5OTctOTlkMy02MTVlYmE1YTlkZDkgVmVyc2lvbjogJExBVEVTVApFTkQgUmVxdWVzdElkOiBmYzg0NGJiOS04YTc4LTQ5OTctOTlkMy02MTVlYmE1YTlkZDkKUkVQT1JUIFJlcXVlc3RJZDogZmM4NDRiYjktOGE3OC00OTk3LTk5ZDMtNjE1ZWJhNWE5ZGQ5CUR1cmF0aW9uOiA1OTkuMjIgbXMJQmlsbGVkIER1cmF0aW9uOiA2MDAgbXMJTWVtb3J5IFNpemU6IDEyOCBNQglNYXggTWVtb3J5IFVzZWQ6IDc2IE1CCQo=",
+    "ExecutedVersion": "$LATEST"
+}
+(virt) ubuntu@ip-172-31-18-230:~/ld-2$ cat output.txt 
+"Match"(virt) ubuntu@ip-172-31-18-230:~/ld-2$ 
+
