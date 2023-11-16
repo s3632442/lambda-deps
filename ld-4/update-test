@@ -1,0 +1,6 @@
+#!/bin/bash
+rm lambda_function.zip 
+zip -r lambda_function.zip lambda_function.py virt/lib/python3.8/site-packages/
+aws lambda update-function-code     --function-name compare-images     --zip-file fileb://lambda_function.zip
+aws lambda invoke     --function-name  compare-images    --payload '{"username_datestring": "billfrank-1637100000"}'     output.txt
+cat output.txt

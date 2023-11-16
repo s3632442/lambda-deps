@@ -1,0 +1,1 @@
+{"errorMessage": "'Contents'", "errorType": "KeyError", "stackTrace": ["  File \"/var/task/lambda_function.py\", line 19, in lambda_handler\n    pending_objects = s3.list_objects(Bucket=pending_bucket, Prefix=username_datestring)['Contents']\n"]}

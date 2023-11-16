@@ -1,0 +1,12 @@
+npm install aws-sdk
+rm function.zip  # if file already exists
+zip -r function.zip index.js node_modules/
+
+aws lambda update-function-code \
+--function-name LambdaFunctionOverHttps \
+--zip-file fileb://function.zip
+
+aws iam attach-role-policy \
+--role-name LambdaExecutionRole \
+--policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+

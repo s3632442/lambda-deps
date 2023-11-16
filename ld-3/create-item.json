@@ -1,0 +1,11 @@
+{
+  "operation": "create",
+  "tableName": "lambda-apigateway",
+  "payload": {
+    "Item": {
+      "pk-id": "1234ABCD",
+      "number": 5
+    }
+  }
+}
+
